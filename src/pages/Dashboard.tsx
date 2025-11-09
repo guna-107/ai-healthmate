@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,6 +35,8 @@ const Dashboard = () => {
   });
 
   const [userName, setUserName] = useState("there");
+  const [healthScore, setHealthScore] = useState(0);
+  const [streakDays, setStreakDays] = useState(0);
 
   useEffect(() => {
     loadDashboardData();
@@ -71,10 +74,27 @@ const Dashboard = () => {
       }
 
       loadRecommendations();
+      calculateHealthScore();
     } catch (error) {
       console.error("Error loading dashboard data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const calculateHealthScore = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('calculate-health-score');
+      
+      if (error) throw error;
+      if (data) {
+        setHealthScore(data.score || 0);
+        setStreakDays(data.streak || 0);
+      }
+    } catch (error) {
+      console.error("Error calculating health score:", error);
     }
   };
 
@@ -139,8 +159,12 @@ const Dashboard = () => {
             <span className="text-xl font-bold">AI Health Mentor</span>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => navigate("/chat")}>
               <MessageSquare className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/achievements")}>
+              <Award className="w-5 h-5" />
             </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
               <Target className="w-5 h-5" />
@@ -301,6 +325,14 @@ const Dashboard = () => {
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View Progress
               </Button>
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigate("/achievements")}
+              >
+                <Award className="w-4 h-4 mr-2" />
+                Achievements
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -315,12 +347,22 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <div className="text-5xl font-bold">87</div>
+              <div className="text-5xl font-bold">{healthScore}</div>
               <div className="flex-1">
-                <p className="text-sm opacity-90 mb-2">Great job! You're on track with your goals.</p>
-                <Progress value={87} className="h-2 bg-primary-foreground/20" />
+                <p className="text-sm opacity-90 mb-2">
+                  {healthScore >= 80 ? "Great job! You're on track with your goals." :
+                   healthScore >= 50 ? "Good progress! Keep it up." :
+                   "Let's work together to improve your health score!"}
+                </p>
+                <Progress value={healthScore} className="h-2 bg-primary-foreground/20" />
               </div>
             </div>
+            {streakDays > 0 && (
+              <div className="mt-4 flex items-center gap-2 text-sm opacity-90">
+                <Flame className="w-4 h-4" />
+                <span>{streakDays} day streak!</span>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>

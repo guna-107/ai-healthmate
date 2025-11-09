@@ -20,6 +20,8 @@ export type Database = {
           achievement_name: string
           achievement_type: string | null
           created_at: string | null
+          description: string | null
+          icon: string | null
           id: string
           user_id: string
         }
@@ -28,6 +30,8 @@ export type Database = {
           achievement_name: string
           achievement_type?: string | null
           created_at?: string | null
+          description?: string | null
+          icon?: string | null
           id?: string
           user_id: string
         }
@@ -36,6 +40,8 @@ export type Database = {
           achievement_name?: string
           achievement_type?: string | null
           created_at?: string | null
+          description?: string | null
+          icon?: string | null
           id?: string
           user_id?: string
         }
@@ -97,6 +103,44 @@ export type Database = {
             foreignKeyName: "daily_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_metrics: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_log_date: string | null
+          score: number | null
+          streak_days: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_log_date?: string | null
+          score?: number | null
+          streak_days?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_log_date?: string | null
+          score?: number | null
+          streak_days?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_metrics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -232,6 +276,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_health_score: { Args: { user_uuid: string }; Returns: number }
+      check_achievements: { Args: { user_uuid: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -239,6 +285,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_user_streak: { Args: { user_uuid: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
