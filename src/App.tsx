@@ -15,6 +15,9 @@ import FoodUpload from "./pages/FoodUpload";
 import AIChat from "./pages/AIChat";
 import Progress from "./pages/Progress";
 import Achievements from "./pages/Achievements";
+import Pricing from "./pages/Pricing";
+import Leaderboard from "./pages/Leaderboard";
+import Social from "./pages/Social";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,15 +74,32 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/achievements"
-                element={
-                  <ProtectedRoute>
-                    <Achievements />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
+            <Route
+              path="/achievements"
+              element={
+                <ProtectedRoute>
+                  <Achievements />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route
+              path="/leaderboard"
+              element={
+                <ProtectedRoute>
+                  <Leaderboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/social"
+              element={
+                <ProtectedRoute>
+                  <Social />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

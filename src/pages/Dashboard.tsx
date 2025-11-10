@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Activity,
   Camera,
@@ -14,7 +14,9 @@ import {
   Zap,
   Target,
   Award,
-  LogOut
+  LogOut,
+  Trophy,
+  Users
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -325,14 +327,24 @@ const Dashboard = () => {
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View Progress
               </Button>
-              <Button 
-                className="w-full justify-start" 
-                variant="outline"
-                onClick={() => navigate("/achievements")}
-              >
-                <Award className="w-4 h-4 mr-2" />
-                Achievements
-              </Button>
+              <Link to="/achievements" className="w-full">
+                <Button className="w-full justify-start" variant="outline">
+                  <Award className="w-4 h-4 mr-2" />
+                  Achievements
+                </Button>
+              </Link>
+              <Link to="/leaderboard" className="w-full">
+                <Button className="w-full justify-start" variant="outline">
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Leaderboard
+                </Button>
+              </Link>
+              <Link to="/social" className="w-full">
+                <Button className="w-full justify-start" variant="outline">
+                  <Users className="w-4 h-4 mr-2" />
+                  Community
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

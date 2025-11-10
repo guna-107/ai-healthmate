@@ -47,10 +47,31 @@ const AIChat = () => {
 
     const loadChatHistory = async () => {
       try {
+        // Get or create conversation for this user
+        const { data: convData } = await supabase
+          .from("conversations")
+          .select("*")
+          .eq("user_id", user.id)
+          .limit(1)
+          .maybeSingle();
+
+        let conversationId = convData?.id;
+
+        if (!conversationId) {
+          const { data: newConv } = await supabase
+            .from("conversations")
+            .insert({ user_id: user.id, title: "Health Chat" })
+            .select()
+            .single();
+          conversationId = newConv?.id;
+        }
+
+        if (!conversationId) return;
+
         const { data, error } = await supabase
           .from("chat_messages")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("conversation_id", conversationId)
           .order("created_at", { ascending: true })
           .limit(50);
 

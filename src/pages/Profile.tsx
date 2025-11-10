@@ -124,20 +124,21 @@ const Profile = () => {
       });
 
       const mockData = [
-        { data_type: "steps", value: Math.floor(Math.random() * 15000), unit: "steps", sync_date: new Date().toISOString().split('T')[0] },
-        { data_type: "calories", value: Math.floor(Math.random() * 500) + 1500, unit: "kcal", sync_date: new Date().toISOString().split('T')[0] },
-        { data_type: "heart_rate", value: Math.floor(Math.random() * 40) + 60, unit: "bpm", sync_date: new Date().toISOString().split('T')[0] },
+        { data_type: "steps", value: "12500", unit: "steps", sync_date: new Date().toISOString().split('T')[0] },
+        { data_type: "calories", value: "2000", unit: "kcal", sync_date: new Date().toISOString().split('T')[0] },
+        { data_type: "heart_rate", value: "72", unit: "bpm", sync_date: new Date().toISOString().split('T')[0] },
       ];
 
       await Promise.all(
         mockData.map(data =>
           supabase.from("health_data_sync").insert({
-            user_id: user?.id,
-            data_type: data.data_type,
-            value: data.value,
-            unit: data.unit,
-            source: provider,
+            user_id: user?.id || '',
+            provider,
             sync_date: data.sync_date,
+            steps: data.data_type === 'steps' ? parseInt(data.value) : null,
+            calories_burned: data.data_type === 'calories' ? parseInt(data.value) : null,
+            sleep_hours: data.data_type === 'sleep' ? parseFloat(data.value) : null,
+            heart_rate_avg: data.data_type === 'heart_rate' ? parseInt(data.value) : null,
           })
         )
       );
