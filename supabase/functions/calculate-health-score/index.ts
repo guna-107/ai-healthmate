@@ -51,21 +51,32 @@ serve(async (req) => {
         user_id: user.id,
         score: scoreData,
         updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'user_id'
       });
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Error updating health metrics:', updateError);
+      throw updateError;
+    }
 
     // Update streak
     const { error: streakError } = await supabase
       .rpc('update_user_streak', { user_uuid: user.id });
 
-    if (streakError) throw streakError;
+    if (streakError) {
+      console.error('Error updating streak:', streakError);
+      throw streakError;
+    }
 
     // Check and award achievements
     const { error: achievementError } = await supabase
       .rpc('check_achievements', { user_uuid: user.id });
 
-    if (achievementError) throw achievementError;
+    if (achievementError) {
+      console.error('Error checking achievements:', achievementError);
+      throw achievementError;
+    }
 
     // Get updated health metrics
     const { data: metrics, error: metricsError } = await supabase
