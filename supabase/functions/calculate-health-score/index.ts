@@ -44,20 +44,39 @@ serve(async (req) => {
 
     if (scoreError) throw scoreError;
 
-    // Update health metrics with calculated score
-    const { error: updateError } = await supabase
+    // Check if health metrics exist
+    const { data: existingMetrics } = await supabase
       .from('health_metrics')
-      .upsert({
-        user_id: user.id,
-        score: scoreData,
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id'
-      });
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    if (updateError) {
-      console.error('Error updating health metrics:', updateError);
-      throw updateError;
+    // Update or insert health metrics with calculated score
+    if (existingMetrics) {
+      const { error: updateError } = await supabase
+        .from('health_metrics')
+        .update({
+          score: scoreData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        console.error('Error updating health metrics:', updateError);
+        throw updateError;
+      }
+    } else {
+      const { error: insertError } = await supabase
+        .from('health_metrics')
+        .insert({
+          user_id: user.id,
+          score: scoreData,
+        });
+
+      if (insertError) {
+        console.error('Error inserting health metrics:', insertError);
+        throw insertError;
+      }
     }
 
     // Update streak
