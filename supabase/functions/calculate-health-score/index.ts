@@ -26,6 +26,18 @@ serve(async (req) => {
       });
     }
 
+    // Ensure profile exists (create if it doesn't)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!profile) {
+      console.log('Creating profile for user:', user.id);
+      await supabase.from('profiles').insert({ id: user.id });
+    }
+
     // Calculate health score using database function
     const { data: scoreData, error: scoreError } = await supabase
       .rpc('calculate_health_score', { user_uuid: user.id });
